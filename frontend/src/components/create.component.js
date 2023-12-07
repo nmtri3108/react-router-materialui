@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import TextField from "@mui/material/TextField";
 import MenuItem from "@mui/material/MenuItem";
 import Button from "@mui/material/Button";
@@ -7,6 +7,8 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
+import { Shirt } from "../apiServices";
+import { useNavigate } from "react-router-dom";
 
 const brands = [
   {
@@ -38,8 +40,50 @@ const sex = [
   },
 ];
 
+const initialValue = {
+  name: "",
+  brand: "GUCCI",
+  createdDate: new Date(),
+  sex: true,
+  price: 0,
+};
+
 const Create = () => {
-  const onSubmit = (e) => {};
+  const [shirt, setShirt] = useState(initialValue);
+  const navigation = useNavigate();
+
+  // useEffect(() => {
+  //   console.log(shirt);
+  // }, [shirt]);
+
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+    setShirt({ ...shirt, [name]: value });
+  };
+
+  const handleChangePrice = (event) => {
+    const { name, value } = event.target;
+    setShirt({ ...shirt, [name]: Number(value) });
+  };
+
+  const handleChangeSex = (event) => {
+    const { name, value } = event.target;
+    setShirt({ ...shirt, [name]: value === "Male" });
+  };
+
+  const handleChangeDate = (value) => {
+    setShirt({ ...shirt, createdDate: value });
+  };
+
+  const onSubmit = (e) => {
+    e.preventDefault();
+
+    Shirt.post(shirt)
+      .then((res) => {
+        navigation("/");
+      })
+      .catch((err) => console.log(err));
+  };
 
   return (
     <>
@@ -64,6 +108,8 @@ const Create = () => {
           name="name"
           fullWidth
           required
+          value={shirt.name}
+          onChange={(e) => handleChange(e)}
           sx={{ marginBottom: 2 }}
         />
         <TextField
@@ -74,6 +120,8 @@ const Create = () => {
           required
           select
           sx={{ marginBottom: 2 }}
+          value={shirt.brand}
+          onChange={(e) => handleChange(e)}
         >
           {brands.map((option) => (
             <MenuItem key={option.value} value={option.value}>
@@ -93,8 +141,9 @@ const Create = () => {
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <DemoContainer components={["DateTimePicker", "DateTimePicker"]}>
             <DateTimePicker
-              label="Uncontrolled picker"
-              defaultValue={dayjs("2022-04-17T15:30")}
+              label="Created Date"
+              value={dayjs(shirt.createdDate)}
+              onChange={(newValue) => handleChangeDate(newValue)}
             />
           </DemoContainer>
         </LocalizationProvider>
@@ -106,6 +155,8 @@ const Create = () => {
           fullWidth
           required
           select
+          value={shirt.sex ? "Male" : "Female"}
+          onChange={(e) => handleChangeSex(e)}
           sx={{ marginBottom: 2, marginTop: 2 }}
         >
           {sex.map((option) => (
@@ -121,6 +172,8 @@ const Create = () => {
           fullWidth
           required
           type="number"
+          value={shirt.price}
+          onChange={(e) => handleChangePrice(e)}
           sx={{ marginBottom: 2 }}
         />
         <Button variant="contained" color="primary" type="submit" fullWidth>
