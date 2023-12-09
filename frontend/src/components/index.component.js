@@ -111,6 +111,7 @@ export default function Index() {
                       variant="contained"
                       color="warning"
                       sx={{ marginRight: 2 }}
+                      onClick={() => navigation(`/update/${row.id}`)}
                     >
                       Update
                     </Button>
