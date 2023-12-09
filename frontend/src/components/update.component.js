@@ -9,6 +9,8 @@ import dayjs from "dayjs";
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import { Shirt } from "../apiServices";
 import { useNavigate, useParams } from "react-router-dom";
+import { useFormik } from "formik";
+import * as Yup from "yup";
 
 const brands = [
   {
@@ -48,15 +50,37 @@ const initialValue = {
   price: 0,
 };
 
+const validationSchema = Yup.object({
+  name: Yup.string().required("Name is required"),
+  brand: Yup.string().required("Brand is required"),
+  createdDate: Yup.date().required("Created Date is required"),
+  sex: Yup.string().required("Sex is required"),
+  price: Yup.number()
+    .required("Price is required")
+    .positive("Price must be positive"),
+});
+
 const Update = () => {
   const { id } = useParams();
-  const [shirt, setShirt] = useState(initialValue);
   const navigation = useNavigate();
+
+  const { handleSubmit, values, setValues, touched, errors, handleBlur } =
+    useFormik({
+      initialValues: initialValue,
+      validationSchema: validationSchema,
+      onSubmit: (values) => {
+        Shirt.put(id, values)
+          .then((res) => {
+            navigation("/");
+          })
+          .catch((err) => console.log(err));
+      },
+    });
 
   useEffect(() => {
     Shirt.get(id)
       .then((res) => {
-        setShirt({
+        setValues({
           name: res.data[0].name,
           brand: res.data[0].brand,
           createdDate: new Date(res.data[0].createdDate),
@@ -67,37 +91,23 @@ const Update = () => {
       .catch((err) => console.log(err));
   }, []);
 
-  // useEffect(() => {
-  //   console.log(shirt);
-  // }, [shirt]);
-
   const handleChange = (event) => {
     const { name, value } = event.target;
-    setShirt({ ...shirt, [name]: value });
+    setValues({ ...values, [name]: value });
   };
 
   const handleChangePrice = (event) => {
     const { name, value } = event.target;
-    setShirt({ ...shirt, [name]: Number(value) });
+    setValues({ ...values, [name]: Number(value) });
   };
 
   const handleChangeSex = (event) => {
     const { name, value } = event.target;
-    setShirt({ ...shirt, [name]: value === "Male" });
+    setValues({ ...values, [name]: value === "Male" });
   };
 
   const handleChangeDate = (value) => {
-    setShirt({ ...shirt, createdDate: value });
-  };
-
-  const onSubmit = (e) => {
-    e.preventDefault();
-
-    Shirt.put(id, shirt)
-      .then((res) => {
-        navigation("/");
-      })
-      .catch((err) => console.log(err));
+    setValues({ ...values, createdDate: value });
   };
 
   return (
@@ -105,7 +115,7 @@ const Update = () => {
       <h1
         style={{ textAlign: "center", color: "#1976D2", marginBottom: "10px" }}
       >
-        Update Shirt
+        Create New Shirt
       </h1>
       <form
         style={{
@@ -115,7 +125,6 @@ const Update = () => {
           margin: "0 auto",
           marginTop: 3,
         }}
-        onSubmit={onSubmit}
       >
         <TextField
           label="Name"
@@ -123,8 +132,11 @@ const Update = () => {
           name="name"
           fullWidth
           required
-          value={shirt.name}
+          value={values.name}
           onChange={(e) => handleChange(e)}
+          onBlur={handleBlur}
+          error={touched.name && Boolean(errors.name)}
+          helperText={touched.name && errors.name}
           sx={{ marginBottom: 2 }}
         />
         <TextField
@@ -135,7 +147,10 @@ const Update = () => {
           required
           select
           sx={{ marginBottom: 2 }}
-          value={shirt.brand}
+          value={values.brand}
+          onBlur={handleBlur}
+          error={touched.brand && Boolean(errors.brand)}
+          helperText={touched.brand && errors.brand}
           onChange={(e) => handleChange(e)}
         >
           {brands.map((option) => (
@@ -157,8 +172,11 @@ const Update = () => {
           <DemoContainer components={["DateTimePicker", "DateTimePicker"]}>
             <DateTimePicker
               label="Created Date"
-              value={dayjs(shirt.createdDate)}
+              value={dayjs(values.createdDate)}
               onChange={(newValue) => handleChangeDate(newValue)}
+              onBlur={handleBlur}
+              error={touched.createdDate && Boolean(errors.createdDate)}
+              helperText={touched.createdDate && errors.createdDate}
             />
           </DemoContainer>
         </LocalizationProvider>
@@ -170,9 +188,12 @@ const Update = () => {
           fullWidth
           required
           select
-          value={shirt.sex ? "Male" : "Female"}
+          value={values.sex ? "Male" : "Female"}
+          onBlur={handleBlur}
           onChange={(e) => handleChangeSex(e)}
           sx={{ marginBottom: 2, marginTop: 2 }}
+          error={touched.sex && Boolean(errors.sex)}
+          helperText={touched.sex && errors.sex}
         >
           {sex.map((option) => (
             <MenuItem key={option.value} value={option.value}>
@@ -187,11 +208,20 @@ const Update = () => {
           fullWidth
           required
           type="number"
-          value={shirt.price}
+          value={values.price}
+          onBlur={handleBlur}
+          error={touched.price && Boolean(errors.price)}
+          helperText={touched.price && errors.price}
           onChange={(e) => handleChangePrice(e)}
           sx={{ marginBottom: 2 }}
         />
-        <Button variant="contained" color="primary" type="submit" fullWidth>
+        <Button
+          onClick={handleSubmit}
+          variant="contained"
+          color="primary"
+          type="submit"
+          fullWidth
+        >
           Submit
         </Button>
       </form>
