@@ -11,6 +11,7 @@ import { Shirt } from "../apiServices";
 import { useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
 import * as Yup from "yup";
+import { useSelector } from "react-redux";
 
 const brands = [
   {
@@ -62,6 +63,7 @@ const validationSchema = Yup.object({
 
 const Create = () => {
   const navigation = useNavigate();
+  const counter = useSelector((state) => state.counter);
 
   const { handleSubmit, values, setValues, touched, errors, handleBlur } =
     useFormik({
@@ -97,6 +99,7 @@ const Create = () => {
 
   return (
     <>
+      <h1>{counter}</h1>
       <h1
         style={{ textAlign: "center", color: "#1976D2", marginBottom: "10px" }}
       >

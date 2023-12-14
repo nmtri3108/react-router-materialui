@@ -10,10 +10,15 @@ import Button from "@mui/material/Button";
 import { Shirt } from "../apiServices";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import { increment, decrement, reset } from "../store/actions/counter";
 
 export default function Index() {
   const [data, setData] = useState([]);
   const navigation = useNavigate();
+
+  const dispatch = useDispatch();
+  const counter = useSelector((state) => state.counter);
 
   useEffect(() => {
     onLoad();
@@ -63,6 +68,13 @@ export default function Index() {
 
   return (
     <>
+      <h1>{counter}</h1>
+      <div>
+        <button onClick={() => dispatch(increment(5))}>increment</button>
+        <button onClick={() => dispatch(decrement(5))}>decrement</button>
+        <button onClick={() => dispatch(reset())}>reset</button>
+      </div>
+
       <Button
         onClick={() => navigation("/create")}
         variant="contained"
