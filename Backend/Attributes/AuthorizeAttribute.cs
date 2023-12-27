@@ -21,7 +21,7 @@ public class AuthorizeAttribute : Attribute, IAuthorizationFilter
             return;
 
         // authorization
-        var user = (User)context.HttpContext.Items["Account"];
+        var user = (User)context.HttpContext.Items["User"];
         if (user == null || (_roles.Any() && !_roles.Contains(user.Role)))
             context.Result = new JsonResult(new { message = "Unauthorized" })
             {

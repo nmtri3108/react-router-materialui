@@ -4,16 +4,18 @@ import { persistStore, persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 
 import counter from "./reducers/counter";
+import user from "./reducers/user";
 
 const allReducers = combineReducers({
   counter,
+  user,
   // add more if needed
 });
 
 const persistsConfig = {
   key: "root",
   storage,
-  whitelist: ["counter"],
+  whitelist: ["counter", "user"],
 };
 
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;

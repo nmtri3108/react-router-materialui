@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using BackEnd.Attributes;
 using BackEnd.Dtos;
 using BackEnd.Models;
 using BackEnd.Services.IServices;
@@ -6,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BackEnd.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class ShirtsController : ControllerBase
