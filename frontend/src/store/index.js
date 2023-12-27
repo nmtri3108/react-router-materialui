@@ -1,5 +1,7 @@
 import { combineReducers } from "redux";
 import { createStore, applyMiddleware, compose } from "redux";
+import { persistStore, persistReducer } from "redux-persist";
+import storage from "redux-persist/lib/storage";
 
 import counter from "./reducers/counter";
 
@@ -8,8 +10,19 @@ const allReducers = combineReducers({
   // add more if needed
 });
 
+const persistsConfig = {
+  key: "root",
+  storage,
+  whitelist: ["counter"],
+};
+
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
-const store = createStore(allReducers, composeEnhancers(applyMiddleware()));
+const persistedReducer = persistReducer(persistsConfig, allReducers);
 
-export default store;
+export const store = createStore(
+  persistedReducer,
+  composeEnhancers(applyMiddleware())
+);
+
+export const persistor = persistStore(store);

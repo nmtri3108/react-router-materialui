@@ -78,6 +78,10 @@ const Create = () => {
       },
     });
 
+  useEffect(() => {
+    console.log(values);
+  }, [values]);
+
   const handleChange = (event) => {
     const { name, value } = event.target;
     setValues({ ...values, [name]: value });

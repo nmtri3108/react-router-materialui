@@ -9,5 +9,6 @@ namespace BackEnd.Data
         {
         }
         public DbSet<Shirt> Shirts { get; set; }
+        public DbSet<User> Users { get; set; }
     }
 }
