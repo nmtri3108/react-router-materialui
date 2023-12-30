@@ -3,8 +3,6 @@ import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Checkbox from "@mui/material/Checkbox";
 import Link from "@mui/material/Link";
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
@@ -12,8 +10,6 @@ import Grid from "@mui/material/Grid";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import { User } from "../apiServices";
-import { useDispatch } from "react-redux";
-import { login } from "../store/actions/user";
 import { useNavigate } from "react-router-dom";
 
 function Copyright(props) {
@@ -33,20 +29,21 @@ function Copyright(props) {
     </Typography>
   );
 }
-const Login = () => {
-  const dispatch = useDispatch();
+const Register = () => {
   const navigation = useNavigate();
+
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
 
-    User.login({
+    User.register({
       email: data.get("email"),
       password: data.get("password"),
+      firstName: data.get("firstName"),
+      lastName: data.get("lastName"),
     })
       .then((res) => {
-        dispatch(login(res.data));
-        navigation("/");
+        navigation("/login");
       })
       .catch((err) => {
         console.log(err);
@@ -85,7 +82,7 @@ const Login = () => {
             <LockOutlinedIcon />
           </Avatar>
           <Typography component="h1" variant="h5">
-            Sign in
+            Sign Up
           </Typography>
           <Box
             component="form"
@@ -107,15 +104,29 @@ const Login = () => {
               margin="normal"
               required
               fullWidth
+              id="firstName"
+              label="First Name"
+              name="firstName"
+              autoComplete="firstName"
+            />
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              id="lastName"
+              label="Last Name"
+              name="lastName"
+              autoComplete="lastName"
+            />
+            <TextField
+              margin="normal"
+              required
+              fullWidth
               name="password"
               label="Password"
               type="password"
               id="password"
               autoComplete="current-password"
-            />
-            <FormControlLabel
-              control={<Checkbox value="remember" color="primary" />}
-              label="Remember me"
             />
             <Button
               type="submit"
@@ -123,7 +134,7 @@ const Login = () => {
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
             >
-              Sign In
+              Sign Up
             </Button>
             <Grid container>
               <Grid item xs>
@@ -132,8 +143,8 @@ const Login = () => {
                 </Link>
               </Grid>
               <Grid item>
-                <Link href="register" variant="body2">
-                  {"Don't have an account? Sign Up"}
+                <Link href="/login" variant="body2">
+                  {"You have an account? Sign In"}
                 </Link>
               </Grid>
             </Grid>
@@ -145,4 +156,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Register;

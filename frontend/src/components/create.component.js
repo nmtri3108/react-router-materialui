@@ -64,13 +64,14 @@ const validationSchema = Yup.object({
 const Create = () => {
   const navigation = useNavigate();
   const counter = useSelector((state) => state.counter);
+  const user = useSelector((state) => state.user);
 
   const { handleSubmit, values, setValues, touched, errors, handleBlur } =
     useFormik({
       initialValues: initialValue,
       validationSchema: validationSchema,
       onSubmit: (values) => {
-        Shirt.post(values)
+        Shirt.post(values, user.token)
           .then((res) => {
             navigation("/");
           })

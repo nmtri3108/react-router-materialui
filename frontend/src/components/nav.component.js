@@ -12,11 +12,16 @@ import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import AdbIcon from "@mui/icons-material/Adb";
 import { Link } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { logout } from "../store/actions/user";
+import { useNavigate } from "react-router-dom";
 
 const pages = [{ name: "Home", path: "/" }];
-const settings = ["Profile", "Account", "Dashboard", "Logout"];
+const settings = ["Profile", "Account", "Dashboard"];
 
 function Navigation() {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
 
@@ -33,6 +38,12 @@ function Navigation() {
 
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
+  };
+
+  const handleLogOutUserMenu = () => {
+    dispatch(logout());
+    setAnchorElUser(null);
+    navigate("/login");
   };
 
   return (
@@ -158,6 +169,9 @@ function Navigation() {
                   <Typography textAlign="center">{setting}</Typography>
                 </MenuItem>
               ))}
+              <MenuItem key={"logout"} onClick={handleLogOutUserMenu}>
+                <Typography textAlign="center">Log Out</Typography>
+              </MenuItem>
             </Menu>
           </Box>
         </Toolbar>

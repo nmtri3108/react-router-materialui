@@ -58,6 +58,7 @@ public class UserService : IUserService
             // map model to new user object
             var user = _mapper.Map<User>(model);
 
+            user.Role = Role.User;            
             // hash password
             user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(model.Password);
 

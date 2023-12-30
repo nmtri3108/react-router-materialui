@@ -22,6 +22,7 @@ namespace BackEnd.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public IList<Shirt> GetAll()
         {
             return _shirtService.GetAll();

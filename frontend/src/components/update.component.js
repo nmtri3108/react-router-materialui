@@ -11,6 +11,7 @@ import { Shirt } from "../apiServices";
 import { useNavigate, useParams } from "react-router-dom";
 import { useFormik } from "formik";
 import * as Yup from "yup";
+import { useSelector } from "react-redux";
 
 const brands = [
   {
@@ -63,13 +64,14 @@ const validationSchema = Yup.object({
 const Update = () => {
   const { id } = useParams();
   const navigation = useNavigate();
+  const user = useSelector((state) => state.user);
 
   const { handleSubmit, values, setValues, touched, errors, handleBlur } =
     useFormik({
       initialValues: initialValue,
       validationSchema: validationSchema,
       onSubmit: (values) => {
-        Shirt.put(id, values)
+        Shirt.put(id, values, user.token)
           .then((res) => {
             navigation("/");
           })
@@ -78,7 +80,7 @@ const Update = () => {
     });
 
   useEffect(() => {
-    Shirt.get(id)
+    Shirt.get(id, user.token)
       .then((res) => {
         setValues({
           name: res.data[0].name,

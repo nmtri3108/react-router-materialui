@@ -14,18 +14,26 @@ function get() {
   return axios.get(`${BASEURL}/Shirts`);
 }
 
-function post(data) {
-  return axios.post(`${BASEURL}/Shirts`, data);
+function post(data, token) {
+  return axios.post(`${BASEURL}/Shirts`, data, {
+    headers: { Authorization: "Bearer " + token },
+  });
 }
 
-function getById(id) {
-  return axios.get(`${BASEURL}/Shirts/${id}`);
+function getById(id, token) {
+  return axios.get(`${BASEURL}/Shirts/${id}`, {
+    headers: { Authorization: "Bearer " + token },
+  });
 }
 
-function put(id, data) {
-  return axios.put(`${BASEURL}/Shirts/${id}`, data);
+function put(id, data, token) {
+  return axios.put(`${BASEURL}/Shirts/${id}`, data, {
+    headers: { Authorization: "Bearer " + token },
+  });
 }
 
-function _delete(id) {
-  return axios.delete(`${BASEURL}/Shirts/${id}`);
+function _delete(id, token) {
+  return axios.delete(`${BASEURL}/Shirts/${id}`, {
+    headers: { Authorization: "Bearer " + token },
+  });
 }

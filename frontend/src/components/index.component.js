@@ -19,6 +19,7 @@ export default function Index() {
 
   const dispatch = useDispatch();
   const counter = useSelector((state) => state.counter);
+  const user = useSelector((state) => state.user);
 
   useEffect(() => {
     onLoad();
@@ -43,7 +44,7 @@ export default function Index() {
       reverseButtons: true,
     }).then((result) => {
       if (result.isConfirmed) {
-        Shirt._delete(id)
+        Shirt._delete(id, user.token)
           .then((res) => {
             onLoad();
             Swal.fire({
@@ -119,21 +120,25 @@ export default function Index() {
                   </TableCell>
                   <TableCell align="right">{row.price}</TableCell>
                   <TableCell align="right">
-                    <Button
-                      variant="contained"
-                      color="warning"
-                      sx={{ marginRight: 2 }}
-                      onClick={() => navigation(`/update/${row.id}`)}
-                    >
-                      Update
-                    </Button>
-                    <Button
-                      onClick={() => deleteShirt(row.id)}
-                      variant="contained"
-                      color="error"
-                    >
-                      Delete
-                    </Button>
+                    {user?.token && (
+                      <>
+                        <Button
+                          variant="contained"
+                          color="warning"
+                          sx={{ marginRight: 2 }}
+                          onClick={() => navigation(`/update/${row.id}`)}
+                        >
+                          Update
+                        </Button>
+                        <Button
+                          onClick={() => deleteShirt(row.id)}
+                          variant="contained"
+                          color="error"
+                        >
+                          Delete
+                        </Button>
+                      </>
+                    )}
                   </TableCell>
                 </TableRow>
               ))
