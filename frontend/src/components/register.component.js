@@ -39,8 +39,10 @@ const Register = () => {
     User.register({
       email: data.get("email"),
       password: data.get("password"),
+      confirmPassword: data.get("confirmPassword"),
       firstName: data.get("firstName"),
       lastName: data.get("lastName"),
+      acceptTerms: true,
     })
       .then((res) => {
         navigation("/login");
@@ -127,6 +129,15 @@ const Register = () => {
               type="password"
               id="password"
               autoComplete="current-password"
+            />
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              name="confirmPassword"
+              label="Confirm Password"
+              type="password"
+              id="confirmPassword"
             />
             <Button
               type="submit"

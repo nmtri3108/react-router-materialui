@@ -56,8 +56,8 @@ public class UserService : IUserService
             if (userList)
             {
                 await SendAlreadyRegisteredEmail(model.Email, origin);
+                return;
             }
-
             
             // map model to new user object
             var user = _mapper.Map<User>(model);
