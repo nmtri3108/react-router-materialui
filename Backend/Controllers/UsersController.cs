@@ -34,7 +34,7 @@ public class UsersController : ControllerBase
     [HttpPost("register")]
     public async Task<IActionResult> Register(RegisterRequest model)
     {
-        await _userService.Register(model);
+        await _userService.Register(model, Request.Headers["origin"]);
         return Ok(new { message = "Registration successful" });
     }
 
