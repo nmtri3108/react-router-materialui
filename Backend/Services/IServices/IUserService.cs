@@ -9,6 +9,7 @@ public interface IUserService
     Task<IEnumerable<User>> GetAll();
     Task<User> GetById(int id);
     Task Register(RegisterRequest model, string origin);
+    Task VerifyEmail(string token);
     Task Update(int id, UpdateRequest model);
     Task Delete(int id);
 }

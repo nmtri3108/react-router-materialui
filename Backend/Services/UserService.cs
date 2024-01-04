@@ -139,6 +139,19 @@ public class UserService : IUserService
             html: message
         );
     }
+    
+    public async Task VerifyEmail(string token)
+    {
+        var account = await _db.Users.SingleOrDefaultAsync(x => x.VerificationToken == token);
+
+        if (account == null)
+            throw new AppException("Verification failed");
+
+        account.Verified = DateTime.UtcNow;
+        account.VerificationToken = null;
+        
+        await _db.SaveChangesAsync();
+    }
 
     public async Task Update(int id, UpdateRequest model)
     {

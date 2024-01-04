@@ -37,6 +37,14 @@ public class UsersController : ControllerBase
         await _userService.Register(model, Request.Headers["origin"]);
         return Ok(new { message = "Registration successful" });
     }
+    
+    [AllowAnonymous]
+    [HttpPost("verify-email")]
+    public async Task<IActionResult> VerifyEmail(VerifyEmailRequest model)
+    {
+        await _userService.VerifyEmail(model.Token);
+        return Ok(new { message = "Verify Email successful, you can now login" });
+    }
 
     [HttpGet]
     public async Task<IActionResult> GetAll()
