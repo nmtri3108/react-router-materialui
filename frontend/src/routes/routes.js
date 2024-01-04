@@ -5,6 +5,7 @@ import Update from "../components/update.component";
 import Login from "../components/login.component";
 import Register from "../components/register.component";
 import RequireAuth from "./requireAuth";
+import VerifyEmail from "../components/verifyEmail.component";
 
 export const router = createBrowserRouter([
   {
@@ -13,6 +14,7 @@ export const router = createBrowserRouter([
     children: [
       { path: "login", element: <Login /> },
       { path: "register", element: <Register /> },
+      { path: "verify-email", element: <VerifyEmail /> },
       {
         element: <RequireAuth />,
         children: [
