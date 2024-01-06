@@ -73,4 +73,28 @@ public class UsersController : ControllerBase
         await _userService.Delete(id);
         return Ok(new { message = "User deleted successfully" });
     }
+    
+    [AllowAnonymous]
+    [HttpPost("forgot-password")]
+    public async Task<IActionResult> ForgotPassword(ForgotPasswordRequest model)
+    {
+        await _userService.ForgotPassword(model, Request.Headers["origin"]);
+        return Ok(new { message = "Please check your email for password reset instructions" });
+    }
+
+    [AllowAnonymous]
+    [HttpPost("validate-reset-token")]
+    public async Task<IActionResult> ValidateResetToken(ValidateResetTokenRequest model)
+    {
+        await _userService.ValidateResetToken(model);
+        return Ok(new { message = "Token is valid" });
+    }
+
+    [AllowAnonymous]
+    [HttpPost("reset-password")]
+    public async Task<IActionResult> ResetPassword(ResetPasswordRequest model)
+    {
+        await _userService.ResetPassword(model);
+        return Ok(new { message = "Password reset successful, you can now login" });
+    }
 }

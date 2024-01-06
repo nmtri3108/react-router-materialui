@@ -198,4 +198,84 @@ public class UserService : IUserService
             throw;
         }
     }
+    
+    public async Task ForgotPassword(ForgotPasswordRequest model, string origin)
+    {
+        var account = _db.Users.SingleOrDefault(x => x.Email == model.Email);
+
+        // always return ok response to prevent email enumeration
+        if (account == null) return;
+
+        // create reset token that expires after 1 day
+        account.ResetToken = GenerateResetToken();
+        account.ResetTokenExpires = DateTime.UtcNow.AddDays(1);
+        
+        await _db.SaveChangesAsync();
+
+        // send email
+        await SendPasswordResetEmail(account, origin);
+    }
+
+    private async Task SendPasswordResetEmail(User account, string origin)
+    {
+        string message = System.IO.File.ReadAllTextAsync("HtmlEmails/PasswordReset.html").GetAwaiter().GetResult();
+        message = message.Replace("[[name]]", account.Email);
+           
+        if (!string.IsNullOrEmpty(origin))
+        {
+            var resetUrl = $"{origin}/reset-password?token={account.ResetToken}";
+            message = message.Replace("[[link]]", resetUrl);
+        }
+        else
+        {
+            message =
+                $@"<p>Please use the below token to reset your password with the <code>/accounts/reset-password</code> api route:</p>
+                            <p><code>{account.ResetToken}</code></p>";
+        }
+
+        await _emailService.Send(
+            to: account.Email,
+            subject: "Sign-up Verification API - Reset Password",
+            html:message
+        );
+    }
+
+    private string? GenerateResetToken()
+    {
+        // token is a cryptographically strong random sequence of values
+        var token = Convert.ToHexString(RandomNumberGenerator.GetBytes(64));
+
+        // ensure token is unique by checking against db
+        var tokenIsUnique = !_db.Users.Any(x => x.ResetToken == token);
+        if (!tokenIsUnique)
+            return GenerateResetToken();
+
+        return token;
+    }
+
+    public async Task ValidateResetToken(ValidateResetTokenRequest model)
+    {
+        await GetAccountByResetToken(model.Token);
+    }
+
+    private async Task<User> GetAccountByResetToken(string token)
+    {
+        var account = await _db.Users.SingleOrDefaultAsync(x =>
+            x.ResetToken == token && x.ResetTokenExpires > DateTime.UtcNow);
+        if (account == null) throw new AppException("Invalid token");
+        return account;
+    }
+
+    public async Task ResetPassword(ResetPasswordRequest model)
+    {
+        var account = await GetAccountByResetToken(model.Token);
+
+        // update password and remove reset token
+        account.PasswordHash = BCrypt.Net.BCrypt.HashPassword(model.Password);
+        account.PasswordReset = DateTime.UtcNow;
+        account.ResetToken = null;
+        account.ResetTokenExpires = null;
+
+        await _db.SaveChangesAsync();
+    }
 }

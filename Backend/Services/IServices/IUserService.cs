@@ -12,4 +12,7 @@ public interface IUserService
     Task VerifyEmail(string token);
     Task Update(int id, UpdateRequest model);
     Task Delete(int id);
+    Task ForgotPassword(ForgotPasswordRequest model, string origin);
+    Task ValidateResetToken(ValidateResetTokenRequest model);
+    Task ResetPassword(ResetPasswordRequest model);
 }
