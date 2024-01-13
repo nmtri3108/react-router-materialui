@@ -30,4 +30,4 @@ public class User
     public bool Sex { get; set; }
     public string? Avatar { get; set; }
     public string? AvatarPublicId { get; set; }
-}
+} 
