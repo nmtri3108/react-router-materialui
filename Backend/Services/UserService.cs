@@ -5,6 +5,7 @@ using BackEnd.Dtos.UserDtos;
 using BackEnd.Models;
 using BackEnd.Services.IServices;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 
 namespace BackEnd.Services;
 
@@ -37,6 +38,104 @@ public class UserService : IUserService
         return response;
     }
 
+    public async Task<AuthenticateResponse> AuthenticateGoogleLogin(GoogleLoginRequest model, string origin)
+    {
+        var googleUser = ValidateGoogleToken(model.TokenId);
+
+        var existingUser = await _db.Users.FirstOrDefaultAsync(u => u.Email == googleUser.Email);
+
+        if (existingUser == null)
+        {
+            // User doesn't exist, create a new user
+            existingUser = CreateUserFromGoogleData(googleUser);
+
+            // Save the new user to the database
+            await _db.Users.AddAsync(existingUser);
+            await _db.SaveChangesAsync();
+        }
+        else
+        {
+            if (!existingUser.IsInternal)
+            {
+                // User exists, update any necessary information
+                existingUser = UpdateUserFromGoogleData(existingUser, googleUser);
+                // Save the updated user to the database
+                _db.Users.Update(existingUser);
+                await _db.SaveChangesAsync();
+            }
+            else
+            {
+                await SendAlreadyRegisteredEmail(existingUser.Email, origin);
+                return new AuthenticateResponse();
+            }
+        }
+
+        // authentication successful so generate jwt and refresh tokens
+        var jwtToken = _jwtUtils.GenerateToken(existingUser);
+
+        var response = _mapper.Map<AuthenticateResponse>(existingUser);
+        response.Token = jwtToken;
+
+        return response;
+    }
+
+    private GoogleUser ValidateGoogleToken(string googleToken)
+    {
+        using (HttpClient client = new HttpClient())
+        {
+            // Set up the request to Google's token validation endpoint
+            var requestUri =
+                $"https://www.googleapis.com/oauth2/v3/tokeninfo?id_token={googleToken}&client_id={AppSettings.GoogleClientId}";
+
+            var request = new HttpRequestMessage(HttpMethod.Get, requestUri);
+            // Send the request and get the response
+            var response = client.SendAsync(request).Result;
+
+            // Check if the request was successful
+            if (response.IsSuccessStatusCode)
+            {
+                // Parse the response content
+                var responseContent = response.Content.ReadAsStringAsync().Result;
+
+                // Deserialize the JSON response to retrieve user information
+                var googleUser = JsonConvert.DeserializeObject<GoogleUser>(responseContent);
+
+                return googleUser;
+            }
+            else
+            {
+                throw new AppException($"Google token validation failed. Status code: {response.StatusCode}");
+            }
+        }
+    }
+
+    private User CreateUserFromGoogleData(GoogleUser googleUser)
+    {
+        var newUser = new User()
+        {
+            FirstName = googleUser.Given_Name,
+            LastName = googleUser.Family_Name,
+            Email = googleUser.Email,
+            Role = Role.User,
+            AcceptTerms = true,
+            Verified = DateTime.UtcNow,
+            Created = DateTime.UtcNow,
+            Avatar = googleUser.Picture,
+            IsInternal = false,
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword("GoogleStrongPass")
+        };
+        return newUser;
+    }
+
+    private User UpdateUserFromGoogleData(User existingUser, GoogleUser googleUser)
+    {
+        existingUser.Email = googleUser.Email;
+        existingUser.FirstName = googleUser.Given_Name;
+        existingUser.LastName = googleUser.Family_Name;
+        existingUser.Avatar = googleUser.Picture;
+        return existingUser;
+    }
+
     public async Task<IEnumerable<User>> GetAll()
     {
         return await _db.Users.ToListAsync();
@@ -58,7 +157,7 @@ public class UserService : IUserService
                 await SendAlreadyRegisteredEmail(model.Email, origin);
                 return;
             }
-            
+
             // map model to new user object
             var user = _mapper.Map<User>(model);
 
@@ -122,13 +221,14 @@ public class UserService : IUserService
 
     private async Task SendAlreadyRegisteredEmail(string email, string origin)
     {
-        string message = System.IO.File.ReadAllTextAsync("HtmlEmails/AlreadyRegisteredEmail.html").GetAwaiter().GetResult();
+        string message = System.IO.File.ReadAllTextAsync("HtmlEmails/AlreadyRegisteredEmail.html").GetAwaiter()
+            .GetResult();
         message = message.Replace("[[name]]", email);
         if (!string.IsNullOrEmpty(origin))
         {
             var returnUrl = $"{origin}/forgot-password";
             message = message.Replace("[[link]]", returnUrl);
-        }                
+        }
         else
             message =
                 "<p>If you don't know your password you can reset it via the <code>/accounts/forgot-password</code> api route.</p>";
@@ -139,7 +239,7 @@ public class UserService : IUserService
             html: message
         );
     }
-    
+
     public async Task VerifyEmail(string token)
     {
         var account = await _db.Users.SingleOrDefaultAsync(x => x.VerificationToken == token);
@@ -149,7 +249,7 @@ public class UserService : IUserService
 
         account.Verified = DateTime.UtcNow;
         account.VerificationToken = null;
-        
+
         await _db.SaveChangesAsync();
     }
 
@@ -157,7 +257,6 @@ public class UserService : IUserService
     {
         try
         {
-
             var user = await _db.Users.FirstOrDefaultAsync(u => u.Id == id);
 
             // validate
@@ -173,7 +272,6 @@ public class UserService : IUserService
             _mapper.Map(model, user);
 
             await _db.SaveChangesAsync();
-
         }
         catch (Exception e)
         {
@@ -190,7 +288,6 @@ public class UserService : IUserService
             if (user == null) throw new KeyNotFoundException("User not found");
             _db.Users.Remove(user);
             _db.SaveChanges();
-
         }
         catch (Exception e)
         {
@@ -198,7 +295,7 @@ public class UserService : IUserService
             throw;
         }
     }
-    
+
     public async Task ForgotPassword(ForgotPasswordRequest model, string origin)
     {
         var account = await _db.Users.SingleOrDefaultAsync(x => x.Email == model.Email);
@@ -209,7 +306,7 @@ public class UserService : IUserService
         // create reset token that expires after 1 day
         account.ResetToken = GenerateResetToken();
         account.ResetTokenExpires = DateTime.UtcNow.AddDays(1);
-        
+
         await _db.SaveChangesAsync();
 
         // send email
@@ -220,7 +317,7 @@ public class UserService : IUserService
     {
         string message = System.IO.File.ReadAllTextAsync("HtmlEmails/PasswordReset.html").GetAwaiter().GetResult();
         message = message.Replace("[[name]]", account.Email);
-           
+
         if (!string.IsNullOrEmpty(origin))
         {
             var resetUrl = $"{origin}/reset-password?token={account.ResetToken}";
@@ -236,7 +333,7 @@ public class UserService : IUserService
         await _emailService.Send(
             to: account.Email,
             subject: "Sign-up Verification API - Reset Password",
-            html:message
+            html: message
         );
     }
 

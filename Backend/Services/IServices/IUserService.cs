@@ -15,4 +15,5 @@ public interface IUserService
     Task ForgotPassword(ForgotPasswordRequest model, string origin);
     Task ValidateResetToken(ValidateResetTokenRequest model);
     Task ResetPassword(ResetPasswordRequest model);
+    Task<AuthenticateResponse> AuthenticateGoogleLogin(GoogleLoginRequest model, string origin);
 }

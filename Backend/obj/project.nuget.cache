@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "TeDBtS433NFWYfsPPWZJMXqW0jqx5YWUZO/RJr0sDj+C6Dg9HRteaiB97rI5oGDvq8HZmicHDvaYChAq34zH9A==",
+  "dgSpecHash": "cT/HFhvlp6jIhuwd+/2aMS8VjhhM+7oT6NoFAtxlYhNjw5iYKoX/hV2mo8bA2Xst15tEF4wxScIKE9UpFegy+w==",
   "success": true,
   "projectFilePath": "/Users/tringuyen/Downloads/ReactRouterDom-main/Backend/BackEnd.csproj",
   "expectedPackageFiles": [
@@ -41,6 +41,7 @@
     "/Users/tringuyen/.nuget/packages/microsoft.win32.registry/4.7.0/microsoft.win32.registry.4.7.0.nupkg.sha512",
     "/Users/tringuyen/.nuget/packages/microsoft.win32.systemevents/4.7.0/microsoft.win32.systemevents.4.7.0.nupkg.sha512",
     "/Users/tringuyen/.nuget/packages/mimekit/4.3.0/mimekit.4.3.0.nupkg.sha512",
+    "/Users/tringuyen/.nuget/packages/newtonsoft.json/13.0.3/newtonsoft.json.13.0.3.nupkg.sha512",
     "/Users/tringuyen/.nuget/packages/swashbuckle.aspnetcore/6.5.0/swashbuckle.aspnetcore.6.5.0.nupkg.sha512",
     "/Users/tringuyen/.nuget/packages/swashbuckle.aspnetcore.swagger/6.5.0/swashbuckle.aspnetcore.swagger.6.5.0.nupkg.sha512",
     "/Users/tringuyen/.nuget/packages/swashbuckle.aspnetcore.swaggergen/6.5.0/swashbuckle.aspnetcore.swaggergen.6.5.0.nupkg.sha512",

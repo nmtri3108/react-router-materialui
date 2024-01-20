@@ -12,5 +12,10 @@
         public static string Password { get; set; }
         public static string Host { get; set; }
         public static int Port { get; set; }
+        
+        // google login 
+        public static string GoogleClientId { get; set; }
+        
+        public static string GoogleClientSecret { get; set; }
     }
 }

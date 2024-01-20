@@ -29,7 +29,15 @@ public class UsersController : ControllerBase
         var response = await _userService.Authenticate(model);
         return Ok(response);
     }
-
+    
+    [AllowAnonymous]
+    [HttpPost("authenticate-google")]
+    public async Task<ActionResult<AuthenticateResponse>> AuthenticateGoogleLogin(GoogleLoginRequest model)
+    {
+        var response = await _userService.AuthenticateGoogleLogin(model, Request.Headers["origin"]);
+        return Ok(response);
+    }
+    
     [AllowAnonymous]
     [HttpPost("register")]
     public async Task<IActionResult> Register(RegisterRequest model)
