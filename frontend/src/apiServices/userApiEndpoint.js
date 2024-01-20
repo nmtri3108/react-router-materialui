@@ -9,6 +9,7 @@ export const User = {
   forgotPassword,
   validateResetToken,
   resetPassword,
+  loginGoogle,
 };
 
 function login(payload) {
@@ -37,4 +38,8 @@ function resetPassword({ token, password, confirmPassword }) {
     password,
     confirmPassword,
   });
+}
+
+function loginGoogle(tokenId) {
+  return axios.post(`${BASEURL}/User/authenticate-google`, { tokenId });
 }

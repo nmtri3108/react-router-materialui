@@ -15,6 +15,7 @@ import { User } from "../apiServices";
 import { useDispatch } from "react-redux";
 import { login } from "../store/actions/user";
 import { useNavigate } from "react-router-dom";
+import { GoogleLogin } from "@react-oauth/google";
 
 function Copyright(props) {
   return (
@@ -52,6 +53,25 @@ const Login = () => {
         console.log(err);
       });
   };
+
+  const onGoogleLoginSuccess = (credentialResponse) => {
+    // Handle the successful Google login response here
+    console.log("Google login success:", credentialResponse);
+    User.loginGoogle(credentialResponse.credential)
+      .then((res) => {
+        dispatch(login(res.data));
+        navigation("/");
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  const onGoogleLoginFailure = () => {
+    // Handle Google login failure here
+    console.error("Google login failure:");
+  };
+
   return (
     <Grid container component="main" sx={{ height: "80vh" }}>
       <CssBaseline />
@@ -138,6 +158,18 @@ const Login = () => {
               </Grid>
             </Grid>
             <Copyright sx={{ mt: 5 }} />
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                padding: "20px",
+              }}
+            >
+              <GoogleLogin
+                onSuccess={onGoogleLoginSuccess}
+                onError={onGoogleLoginFailure}
+              />
+            </div>
           </Box>
         </Box>
       </Grid>

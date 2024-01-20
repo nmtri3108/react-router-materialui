@@ -286,3 +286,4 @@ C:/Study/HocThem/ShirtManager/Backend/obj/Debug/net6.0/ref/BackEnd.dll
 /Users/tringuyen/Downloads/ReactRouterDom-main/Backend/bin/Debug/net6.0/System.Text.Encoding.CodePages.dll
 /Users/tringuyen/Downloads/ReactRouterDom-main/Backend/bin/Debug/net6.0/runtimes/win/lib/net6.0/System.Security.Cryptography.Pkcs.dll
 /Users/tringuyen/Downloads/ReactRouterDom-main/Backend/bin/Debug/net6.0/runtimes/win/lib/net6.0/System.Text.Encoding.CodePages.dll
+/Users/tringuyen/Downloads/ReactRouterDom-main/Backend/bin/Debug/net6.0/Newtonsoft.Json.dll
